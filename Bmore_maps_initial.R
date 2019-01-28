@@ -24,7 +24,7 @@ NBHD_Labels <- NBHDs %>% select(LABEL, geometry)
 plot(NBHD_Labels) ##Better except for weird title
 
 ##Fancy GGPLOT time!
-NBHD_Acres <- NBHDs %>% select(ACRES,geometry)
+NBHD_Acres <- NBHDs %>% select(LABEL, ACRES, geometry)
 NBHD_Acres %>% ggplot(aes(fill = ACRES)) + geom_sf() + scale_fill_viridis_c() + ##This scale fill is better than the standard
   theme_bw() +
   labs(title = "Neighborhood Size")
@@ -34,8 +34,22 @@ NBHD_Acres %>% ggplot(aes(fill = ACRES)) + geom_sf() + scale_fill_viridis_c() + 
 Balt_Census <- read_sf(dsn = "Census", layer = "2010_Census_Profile_by_Neighborhood_Statistical_Areas")
 
 ##Look at Raw Population
-NBHD_pop <- Balt_Census %>% select(Population, geometry)
+NBHD_pop <- as.data.frame(Balt_Census) %>% select(-geometry) ##geometries are sticky, you have to change to data.frame
+NBHD_pop <- left_join(NBHD_Acres, NBHD_pop, by = c("LABEL" = "Name"))
 NBHD_pop %>% ggplot(aes(fill = Population)) + geom_sf() + scale_fill_viridis_c() + 
   theme_bw() + 
   labs(title = "Neighborhood Population")
+##Try Density
+NBHD_pop <- NBHD_pop %>% mutate(Density = Population/ACRES)
+NBHD_pop %>% ggplot(aes(fill = Density)) + geom_sf() + scale_fill_viridis_c() + 
+  theme_bw() + 
+  labs(title = "Neighborhood Density",
+       subtitle = "People Per Acre")
+
+##Let's see if we can identify the "White L" from the data
+NBHD_pop <- NBHD_pop %>% mutate(Perc_White = round((White/Population)*100, digits = 2))
+NBHD_pop %>% ggplot(aes(fill = Perc_White)) + geom_sf() + scale_fill_viridis_c() + 
+  theme_bw() + 
+  labs(title = "Neighborhood Majority",
+       subtitle = "Percentage of White People")
 
