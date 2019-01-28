@@ -26,7 +26,8 @@ plot(NBHD_Labels) ##Better except for weird title
 ##Fancy GGPLOT time!
 NBHD_Acres <- NBHDs %>% select(ACRES,geometry)
 NBHD_Acres %>% ggplot(aes(fill = ACRES)) + geom_sf() + scale_fill_viridis_c() + ##This scale fill is better than the standard
-  theme_bw() 
+  theme_bw() +
+  labs(title = "Neighborhood Size")
 
 #########
 ##Let's bring this together with Census data
