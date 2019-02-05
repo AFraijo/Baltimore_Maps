@@ -54,9 +54,10 @@ NBHD_pop %>% ggplot(aes(fill = Perc_White)) + geom_sf() + scale_fill_viridis_c()
        subtitle = "Percentage of White People")
 
 NBHD_pop <- NBHD_pop %>% 
-  mutate(Majority = if_else((White/Population)>=.5, "White",
-                 if_else((Blk_AfAm/Population) >= .5, "Black", 
-                         if_else(Population == 0.0, "No Population", "Other"),"Other")))
+  mutate(Majority = case_when((White/Population)>=.5 ~ "White",
+                              (Blk_AfAm/Population) >= .5 ~ "Black",
+                              (Population/1.0) == 0.0 ~ "No Population",
+                               TRUE ~ "Other"))
 
 
 NBHD_pop %>% ggplot(aes(fill = Majority)) + 
